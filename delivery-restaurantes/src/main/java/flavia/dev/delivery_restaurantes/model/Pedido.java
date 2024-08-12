@@ -2,15 +2,12 @@ package flavia.dev.delivery_restaurantes.model;
 
 import java.util.Date;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.CascadeType;
+import com.stripe.model.OrderItem;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -25,39 +22,39 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "orders")
-public class Order {
+@Table(name = "pedido")
+public class Pedido {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
+	private Long montanteTotal;
+	private String statusPedido;
+	private int totalItem;
+	private int valorTotal;
+	
+	
 	@ManyToOne
-	private User customer;
+	private User cliente;
 
 	@JsonIgnore
 	@ManyToOne
 	private Restaurant restaurant;
 
-	private Long totalAmount;
-	
-	private String orderStatus;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdAt;
+	private Date criadoEm;
 
 	@ManyToOne
-	private Address deliveryAddress;
+	private Endereco deliveryEndereco;
 
 //	@JsonIgnore
 	@OneToMany
 	private List<OrderItem> items;
 
 	@OneToOne
-	private Payment payment;
+	private Pagamento pagamento;
 	
-	private int totalItem;
 	
-	private int totalPrice;
+}
 
-}
-}
