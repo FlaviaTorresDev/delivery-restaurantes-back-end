@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import flavia.dev.delivery_restaurantes.model.InformacaoContato;
 
-public interface InformacoesContatoRepository extends JpaRepository<InformacaoContato, Long>{
+public interface InformacaoContatoRepository extends JpaRepository<InformacaoContato, Long>{
 
 }
