@@ -1,11 +1,11 @@
 package flavia.dev.delivery_restaurantes.service;
 
+import flavia.dev.delivery_restaurantes.exception.CarrinhoException;
+import flavia.dev.delivery_restaurantes.exception.CarrinhoItemException;
+import flavia.dev.delivery_restaurantes.exception.ComidaException;
+import flavia.dev.delivery_restaurantes.exception.UserException;
 import flavia.dev.delivery_restaurantes.model.Carrinho;
 import flavia.dev.delivery_restaurantes.model.CarrinhoItem;
-import flavia.dev.delivery_restaurantes.service.exception.CarrinhoException;
-import flavia.dev.delivery_restaurantes.service.exception.CarrinhoItemException;
-import flavia.dev.delivery_restaurantes.service.exception.ComidaException;
-import flavia.dev.delivery_restaurantes.service.exception.UserException;
 import flavia.dev.delivery_restaurantes.service.request.AddCarrinhoItemRequest;
 
 public interface CarrinhoSerive {

@@ -3,9 +3,9 @@ package flavia.dev.delivery_restaurantes.service;
 
 import java.util.List;
 
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
 import flavia.dev.delivery_restaurantes.model.IngredientCategoria;
 import flavia.dev.delivery_restaurantes.model.IngredientsItem;
-import flavia.dev.delivery_restaurantes.service.exception.RestaurantException;
 
 
 

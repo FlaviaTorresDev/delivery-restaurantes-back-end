@@ -2,11 +2,11 @@ package flavia.dev.delivery_restaurantes.service;
 
 import java.util.List;
 
+import flavia.dev.delivery_restaurantes.exception.ComidaException;
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
 import flavia.dev.delivery_restaurantes.model.Categoria;
 import flavia.dev.delivery_restaurantes.model.Comida;
 import flavia.dev.delivery_restaurantes.model.Restaurant;
-import flavia.dev.delivery_restaurantes.service.exception.ComidaException;
-import flavia.dev.delivery_restaurantes.service.exception.RestaurantException;
 import flavia.dev.delivery_restaurantes.service.request.CreateComidaRequest;
 
 ;

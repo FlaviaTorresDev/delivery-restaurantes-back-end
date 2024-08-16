@@ -2,9 +2,9 @@ package flavia.dev.delivery_restaurantes.service;
 
 import java.util.List;
 
+import flavia.dev.delivery_restaurantes.exception.ReviewException;
 import flavia.dev.delivery_restaurantes.model.Review;
 import flavia.dev.delivery_restaurantes.model.User;
-import flavia.dev.delivery_restaurantes.service.exception.ReviewException;
 import flavia.dev.delivery_restaurantes.service.request.ReviewRequest;
 
 
