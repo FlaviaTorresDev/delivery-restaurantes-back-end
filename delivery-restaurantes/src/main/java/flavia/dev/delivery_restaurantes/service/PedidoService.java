@@ -11,12 +11,13 @@ import flavia.dev.delivery_restaurantes.exception.UserException;
 import flavia.dev.delivery_restaurantes.model.PagamentoResponse;
 import flavia.dev.delivery_restaurantes.model.Pedido;
 import flavia.dev.delivery_restaurantes.model.User;
-import flavia.dev.delivery_restaurantes.service.request.CreatePedidoRequest;
+import flavia.dev.delivery_restaurantes.request.CriarPedidoRequest;
+
 
 
 public interface PedidoService {
 	
-	 public PagamentoResponse createPedido(CreatePedidoRequest order, User user) throws UserException, RestaurantException, CarrinhoException, StripeException;
+	 public PagamentoResponse createPedido(CriarPedidoRequest order, User user) throws UserException, RestaurantException, CarrinhoException, StripeException;
 	 
 	 public Pedido updatePedido(Long pedidoId, String pedidoStatus) throws PedidoException;
 	 

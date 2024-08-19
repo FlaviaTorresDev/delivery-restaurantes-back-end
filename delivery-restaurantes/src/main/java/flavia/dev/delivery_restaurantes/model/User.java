@@ -3,6 +3,8 @@ package flavia.dev.delivery_restaurantes.model;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import flavia.dev.delivery_restaurantes.domain.USER_ROLE;
 import flavia.dev.delivery_restaurantes.dto.RestaurantDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;

@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.zosh.domain.USER_ROLE;
+
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.UserRepository;
+import flavia.dev.delivery_restaurantes.service.UserService;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +24,7 @@ public class ClienteUserServiceImpl implements UserDetailsService {
 	
 	private UserRepository userRepository;
 	
-	public CustomeUserServiceImplementation(UserRepository userRepository) {
+	public ClienteUserServiceImpl(UserRepository userRepository) {
 		this.userRepository=userRepository;
 	}
 

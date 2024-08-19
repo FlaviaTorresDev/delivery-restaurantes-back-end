@@ -8,5 +8,5 @@ import flavia.dev.delivery_restaurantes.model.Carrinho;
 
 public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> {
 
-	 Optional<Carrinho> findByCustomer_Id(Long userId);
+	 Optional<Carrinho> findByCliente_Id(Long userId);
 }

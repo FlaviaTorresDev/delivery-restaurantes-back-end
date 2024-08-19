@@ -6,15 +6,16 @@ import flavia.dev.delivery_restaurantes.dto.RestaurantDto;
 import flavia.dev.delivery_restaurantes.exception.RestaurantException;
 import flavia.dev.delivery_restaurantes.model.Restaurant;
 import flavia.dev.delivery_restaurantes.model.User;
-import flavia.dev.delivery_restaurantes.service.request.CreateRestaurantRequest;
+import flavia.dev.delivery_restaurantes.request.CriarRestaurantRequest;
+
 
 
 
 public interface RestaurantService {
 
-	public Restaurant createRestaurant(CreateRestaurantRequest req,User user);
+	public Restaurant createRestaurant(CriarRestaurantRequest req,User user);
 
-	public Restaurant updateRestaurant(Long restaurantId, CreateRestaurantRequest updatedRestaurant)
+	public Restaurant updateRestaurant(Long restaurantId, CriarRestaurantRequest updatedRestaurant)
 			throws RestaurantException;
 
 	public void deleteRestaurant(Long restaurantId) throws RestaurantException;

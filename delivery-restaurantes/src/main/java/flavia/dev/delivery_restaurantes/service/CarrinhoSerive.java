@@ -6,7 +6,8 @@ import flavia.dev.delivery_restaurantes.exception.ComidaException;
 import flavia.dev.delivery_restaurantes.exception.UserException;
 import flavia.dev.delivery_restaurantes.model.Carrinho;
 import flavia.dev.delivery_restaurantes.model.CarrinhoItem;
-import flavia.dev.delivery_restaurantes.service.request.AddCarrinhoItemRequest;
+import flavia.dev.delivery_restaurantes.request.AddCarrinhoItemRequest;
+
 
 public interface CarrinhoSerive {
 

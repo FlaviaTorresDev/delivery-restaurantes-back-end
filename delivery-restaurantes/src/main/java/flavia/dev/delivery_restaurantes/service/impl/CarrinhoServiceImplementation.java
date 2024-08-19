@@ -16,9 +16,10 @@ import flavia.dev.delivery_restaurantes.model.User;
 import flavia.dev.delivery_restaurantes.repository.CarrinhoItemRepository;
 import flavia.dev.delivery_restaurantes.repository.CarrinhoRepository;
 import flavia.dev.delivery_restaurantes.repository.ComidaRepository;
+import flavia.dev.delivery_restaurantes.request.AddCarrinhoItemRequest;
 import flavia.dev.delivery_restaurantes.service.CarrinhoSerive;
 import flavia.dev.delivery_restaurantes.service.UserService;
-import flavia.dev.delivery_restaurantes.service.request.AddCarrinhoItemRequest;
+
 
 
 
@@ -32,14 +33,14 @@ public class CarrinhoServiceImplementation implements CarrinhoSerive {
 	@Autowired
 	private CarrinhoItemRepository carrinhoItemRepository;
 	@Autowired
-	private ComidaRepository menuItemRepository;
+	private ComidaRepository comidaRepository;
 
 	@Override
 	public CarrinhoItem addItemToCarrinho(AddCarrinhoItemRequest req, String jwt) throws UserException, ComidaException, CarrinhoException, CarrinhoItemException {
 
-		User user = userService.findUserProfileByJwt(jwt);
+		User user = userService.findUserPerfilByJwt(jwt);
 		
-		Optional<Comida> menuItem=menuItemRepository.findById(req.getMenuItemId());
+		Optional<Comida> menuItem=comidaRepository.findById(req.getMenuItemId());
 		if(menuItem.isEmpty()) {
 			throw new ComidaException("Menu Item not exist with id "+req.getMenuItemId());
 		}
@@ -59,7 +60,7 @@ public class CarrinhoServiceImplementation implements CarrinhoSerive {
 		newCarrinhoItem.setQuantidade(req.getQuantidade());
 		newCarrinhoItem.setCarrinho(carrinho);
 		newCarrinhoItem.setIngredients(req.getIngredients());
-		newCarrinhoItem.setTotalValor(req.getQuantidade()*menuItem.get().getValor());
+		newCarrinhoItem.setValorTotal(req.getQuantidade()*menuItem.get().getValor());
 		
 		CarrinhoItem savedItem=carrinhoItemRepository.save(newCarrinhoItem);
 		carrinho.getItems().add(savedItem);
@@ -70,71 +71,71 @@ public class CarrinhoServiceImplementation implements CarrinhoSerive {
 	}
 
 	@Override
-	public CarrinhoItem updateCarrinhoItemQuantity(Long cartItemId,int quantity) throws CartItemException {
-		Optional<CartItem> cartItem=cartItemRepository.findById(cartItemId);
-		if(cartItem.isEmpty()) {
-			throw new CartItemException("cart item not exist with id "+cartItemId);
+	public CarrinhoItem updateCarrinhoItemQuantidade(Long carrinhoItemId,int quantidade) throws CarrinhoItemException {
+		Optional<CarrinhoItem> carrinhoItem= carrinhoItemRepository.findById(carrinhoItemId);
+		if(carrinhoItem.isEmpty()) {
+			throw new CarrinhoItemException("cart item not exist with id "+ carrinhoItemId);
 		}
-		cartItem.get().setQuantity(quantity);
-		cartItem.get().setTotalPrice((cartItem.get().getFood().getPrice()*quantity));
-		return cartItemRepository.save(cartItem.get());
+		carrinhoItem.get().setQuantidade(quantidade);
+		carrinhoItem.get().setValorTotal((carrinhoItem.get().getComida().getValor()*quantidade));
+		return carrinhoItemRepository.save(carrinhoItem.get());
 	}
 
 	@Override
-	public Cart removeItemFromCart(Long cartItemId, String jwt) throws UserException, 
-	CartException, CartItemException {
+	public Carrinho removeItemFromCarrinho(Long carrinhoItemId, String jwt) throws UserException, 
+	CarrinhoException, CarrinhoItemException {
 
-		User user = userService.findUserProfileByJwt(jwt);
+		User user = userService.findUserPerfilByJwt(jwt);
 
-		Cart cart = findCartByUserId(user.getId());
+		Carrinho carrinho = findCarrinhoByUserId(user.getId());
 		
-		Optional<CartItem> cartItem=cartItemRepository.findById(cartItemId);
+		Optional<CarrinhoItem> carrinhoItem= carrinhoItemRepository.findById(carrinhoItemId);
 		
-		if(cartItem.isEmpty()) {
-			throw new CartItemException("cart item not exist with id "+cartItemId);
+		if(carrinhoItem.isEmpty()) {
+			throw new CarrinhoItemException("cart item not exist with id "+carrinhoItemId);
 		}
 
-		cart.getItems().remove(cartItem.get());
-		return cartRepository.save(cart);
+		carrinho.getItems().remove(carrinhoItem.get());
+		return carrinhoRepository.save(carrinho);
 	}
 
 	@Override
-	public Long calculateCartTotals(Cart cart) throws UserException {
+	public Long calcularTotalCarrinho(Carrinho carrinho) throws UserException {
 
 		Long total = 0L;
-		for (CartItem cartItem : cart.getItems()) {
-			total += cartItem.getFood().getPrice() * cartItem.getQuantity();
+		for (CarrinhoItem carrinhoItem : carrinho.getItems()) {
+			total += carrinhoItem.getComida().getValor() * carrinhoItem.getQuantidade();
 		}
 		return total;
 	}
 
 	@Override
-	public Cart findCartById(Long id) throws CartException {
-		Optional<Cart> cart = cartRepository.findById(id);
-		if(cart.isPresent()) {
-			return cart.get();
+	public Carrinho findCarrinhoById(Long id) throws CarrinhoException {
+		Optional<Carrinho> carrinho = carrinhoRepository.findById(id);
+		if(carrinho.isPresent()) {
+			return carrinho.get();
 		}
-		throw new CartException("Cart not found with the id "+id);
+		throw new CarrinhoException("Cart not found with the id "+id);
 	}
 
 	@Override
-	public Cart findCartByUserId(Long userId) throws CartException, UserException {
+	public Carrinho findCarrinhoByUserId(Long userId) throws CarrinhoException, UserException {
 	
-		Optional<Cart> opt=cartRepository.findByCustomer_Id(userId);
+		Optional<Carrinho> opt=carrinhoRepository.findByCliente_Id(userId);
 		
 		if(opt.isPresent()) {
 			return opt.get();
 		}
-		throw new CartException("cart not found");
+		throw new CarrinhoException("cart not found");
 		
 	}
 
 	@Override
-	public Cart clearCart(Long userId) throws CartException, UserException {
-		Cart cart=findCartByUserId(userId);
+	public Carrinho limparCarrinho(Long userId) throws CarrinhoException, UserException {
+		Carrinho carrinho=findCarrinhoByUserId(userId);
 		
-		cart.getItems().clear();
-		return cartRepository.save(cart);
+		carrinho.getItems().clear();
+		return carrinhoRepository.save(carrinho);
 	}
 
 	

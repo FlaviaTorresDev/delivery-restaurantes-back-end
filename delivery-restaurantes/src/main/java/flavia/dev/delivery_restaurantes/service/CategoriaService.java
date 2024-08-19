@@ -8,7 +8,7 @@ import flavia.dev.delivery_restaurantes.model.Categoria;
 
 public interface CategoriaService {
 	
-	public Categoria createCategoria (String nome,Long userId) throws RestaurantException;
+	public Categoria criarCategoria (String nome,Long userId) throws RestaurantException;
 	public List<Categoria> findCategoriaByRestaurantId(Long restaurantId) throws RestaurantException;
 	public Categoria findCategoriaById(Long id) throws RestaurantException;
 

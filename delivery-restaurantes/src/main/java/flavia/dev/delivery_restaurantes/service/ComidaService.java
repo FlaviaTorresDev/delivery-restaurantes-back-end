@@ -7,13 +7,14 @@ import flavia.dev.delivery_restaurantes.exception.RestaurantException;
 import flavia.dev.delivery_restaurantes.model.Categoria;
 import flavia.dev.delivery_restaurantes.model.Comida;
 import flavia.dev.delivery_restaurantes.model.Restaurant;
-import flavia.dev.delivery_restaurantes.service.request.CreateComidaRequest;
+import flavia.dev.delivery_restaurantes.request.CriarComidaRequest;
+
 
 ;
 
 public interface ComidaService {
 
-	public Comida createFood(CreateComidaRequest req,Categoria categoria,
+	public Comida createFood(CriarComidaRequest req,Categoria categoria,
 						   Restaurant restaurant) throws ComidaException, RestaurantException;
 
 	void deleteComida(Long ComidaId) throws ComidaException;
