@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Data
 @Getter
-public class AddCartItemRequest {
+public class AddCarrinhoItemRequest {
 	
 	private Long menuItemId;
 	private int quantidade;
