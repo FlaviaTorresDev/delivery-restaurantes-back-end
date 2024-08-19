@@ -5,57 +5,72 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.exception.CarrinhoException;
+import flavia.dev.delivery_restaurantes.exception.CarrinhoItemException;
+import flavia.dev.delivery_restaurantes.exception.ComidaException;
+import flavia.dev.delivery_restaurantes.exception.UserException;
+import flavia.dev.delivery_restaurantes.model.Carrinho;
+import flavia.dev.delivery_restaurantes.model.CarrinhoItem;
+import flavia.dev.delivery_restaurantes.model.Comida;
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.CarrinhoItemRepository;
+import flavia.dev.delivery_restaurantes.repository.CarrinhoRepository;
+import flavia.dev.delivery_restaurantes.repository.ComidaRepository;
+import flavia.dev.delivery_restaurantes.service.CarrinhoSerive;
+import flavia.dev.delivery_restaurantes.service.UserService;
+import flavia.dev.delivery_restaurantes.service.request.AddCarrinhoItemRequest;
+
 
 
 @Service
-public class CarrinhoServiceImplementation implements CartSerive {
+public class CarrinhoServiceImplementation implements CarrinhoSerive {
 	
 	@Autowired
-	private CartRepository cartRepository;
+	private CarrinhoRepository carrinhoRepository;
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private CartItemRepository cartItemRepository;
+	private CarrinhoItemRepository carrinhoItemRepository;
 	@Autowired
-	private foodRepository menuItemRepository;
+	private ComidaRepository menuItemRepository;
 
 	@Override
-	public CartItem addItemToCart(AddCartItemRequest req, String jwt) throws UserException, FoodException, CartException, CartItemException {
+	public CarrinhoItem addItemToCarrinho(AddCarrinhoItemRequest req, String jwt) throws UserException, ComidaException, CarrinhoException, CarrinhoItemException {
 
 		User user = userService.findUserProfileByJwt(jwt);
 		
-		Optional<Food> menuItem=menuItemRepository.findById(req.getMenuItemId());
+		Optional<Comida> menuItem=menuItemRepository.findById(req.getMenuItemId());
 		if(menuItem.isEmpty()) {
-			throw new FoodException("Menu Item not exist with id "+req.getMenuItemId());
+			throw new ComidaException("Menu Item not exist with id "+req.getMenuItemId());
 		}
 
-		Cart cart = findCartByUserId(user.getId());
+		Carrinho carrinho = findCarrinhoByUserId(user.getId());
 
-		for (CartItem cartItem : cart.getItems()) {
-			if (cartItem.getFood().equals(menuItem.get())) {
+		for (CarrinhoItem carrinhoItem : carrinho.getItems()) {
+			if (carrinhoItem.getComida().equals(menuItem.get())) {
 
-				int newQuantity = cartItem.getQuantity() + req.getQuantity();
-				return updateCartItemQuantity(cartItem.getId(),newQuantity);
+				int newQuantity = carrinhoItem.getQuantidade() + req.getQuantidade();
+				return updateCarrinhoItemQuantidade(carrinhoItem.getId(),newQuantity);
 			}
 		}
 
-		CartItem newCartItem = new CartItem();
-		newCartItem.setFood(menuItem.get());
-		newCartItem.setQuantity(req.getQuantity());
-		newCartItem.setCart(cart);
-		newCartItem.setIngredients(req.getIngredients());
-		newCartItem.setTotalPrice(req.getQuantity()*menuItem.get().getPrice());
+		CarrinhoItem newCarrinhoItem = new CarrinhoItem();
+		newCarrinhoItem.setComida(menuItem.get());
+		newCarrinhoItem.setQuantidade(req.getQuantidade());
+		newCarrinhoItem.setCarrinho(carrinho);
+		newCarrinhoItem.setIngredients(req.getIngredients());
+		newCarrinhoItem.setTotalValor(req.getQuantidade()*menuItem.get().getValor());
 		
-		CartItem savedItem=cartItemRepository.save(newCartItem);
-		cart.getItems().add(savedItem);
-		cartRepository.save(cart);
+		CarrinhoItem savedItem=carrinhoItemRepository.save(newCarrinhoItem);
+		carrinho.getItems().add(savedItem);
+		carrinhoRepository.save(carrinho);
 		
 		return savedItem;
 
 	}
 
 	@Override
-	public CartItem updateCartItemQuantity(Long cartItemId,int quantity) throws CartItemException {
+	public CarrinhoItem updateCarrinhoItemQuantity(Long cartItemId,int quantity) throws CartItemException {
 		Optional<CartItem> cartItem=cartItemRepository.findById(cartItemId);
 		if(cartItem.isEmpty()) {
 			throw new CartItemException("cart item not exist with id "+cartItemId);
