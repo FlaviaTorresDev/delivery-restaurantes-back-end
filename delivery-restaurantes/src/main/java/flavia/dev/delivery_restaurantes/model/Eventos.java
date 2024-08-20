@@ -30,6 +30,6 @@ public class Eventos {
 	@ManyToOne
 	private Restaurant restaurant;
 	
-	private String localização;
+	private String localizacao;
 
 }

@@ -11,19 +11,41 @@ import org.springframework.stereotype.Service;
 
 import com.stripe.exception.StripeException;
 
+import flavia.dev.delivery_restaurantes.exception.CarrinhoException;
+import flavia.dev.delivery_restaurantes.exception.PedidoException;
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
+import flavia.dev.delivery_restaurantes.exception.UserException;
+import flavia.dev.delivery_restaurantes.model.Carrinho;
+import flavia.dev.delivery_restaurantes.model.CarrinhoItem;
+import flavia.dev.delivery_restaurantes.model.Endereco;
+import flavia.dev.delivery_restaurantes.model.Notificacao;
+import flavia.dev.delivery_restaurantes.model.PagamentoResponse;
+import flavia.dev.delivery_restaurantes.model.Pedido;
+import flavia.dev.delivery_restaurantes.model.PedidoItem;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.PedidoItemRepository;
+import flavia.dev.delivery_restaurantes.repository.PedidoRepository;
+import flavia.dev.delivery_restaurantes.repository.RestaurantRepository;
+import flavia.dev.delivery_restaurantes.repository.UserRepository;
+import flavia.dev.delivery_restaurantes.repository.enderecoRepository;
+import flavia.dev.delivery_restaurantes.request.CriarPedidoRequest;
+import flavia.dev.delivery_restaurantes.service.CarrinhoSerive;
+import flavia.dev.delivery_restaurantes.service.NotificacaoService;
+import flavia.dev.delivery_restaurantes.service.PagamentoService;
 import flavia.dev.delivery_restaurantes.service.PedidoService;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
 	
 	@Autowired
-	private AddressRepository addressRepository;
+	private enderecoRepository enderecoRepository;
 	@Autowired
-	private CartSerive cartService;
+	private CarrinhoSerive carrinhoService;
 	@Autowired
-	private OrderItemRepository orderItemRepository;
+	private PedidoItemRepository pedidoItemRepository;
 	@Autowired
-	private OrderRepository orderRepository;
+	private PedidoRepository pedidoRepository;
 	@Autowired
 	private RestaurantRepository restaurantRepository;
 	
@@ -31,114 +53,116 @@ public class PedidoServiceImpl implements PedidoService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private PaymentService paymentSerive;
+	private PagamentoService pagamentoService;
 	
 	@Autowired
-	private NotificationService notificationService;
+	private NotificacaoService notificacaoService;
 	
 
 	
 
 	@Override
-	public PaymentResponse createOrder(CreateOrderRequest order,User user) throws UserException, RestaurantException, CartException, StripeException {
+	public PagamentoResponse createPedido(CriarPedidoRequest pedido,User user) throws UserException, RestaurantException, CarrinhoException, StripeException {
 		
-	    Address shippAddress = order.getDeliveryAddress();
+	    Endereco envioEndereco = pedido.getDeliveryEndereco();
 
 	    
-	    Address savedAddress = addressRepository.save(shippAddress);
+	    Endereco enderecoSalvo = enderecoRepository.save(envioEndereco);
 	    
-	    if(!user.getAddresses().contains(savedAddress)) {
-	    	user.getAddresses().add(savedAddress);
+	    if(!user.getEnderecos().contains(enderecoSalvo)) {
+	    	user.getEnderecos().add(enderecoSalvo);
 	    }
 	    
 		
-		System.out.println("user addresses --------------  "+user.getAddresses());
+		System.out.println("user addresses --------------  "+user.getEnderecos());
 		   
 		 userRepository.save(user);
 	    
-	    Optional<Restaurant> restaurant = restaurantRepository.findById(order.getRestaurantId());
+	    Optional<Restaurant> restaurant = restaurantRepository.findById(pedido.getRestaurantId());
 	    if(restaurant.isEmpty()) {
-	    	throw new RestaurantException("Restaurant not found with id "+order.getRestaurantId());
+	    	throw new RestaurantException("Restaurant not found with id "+pedido.getRestaurantId());
 	    }
 	    
-	    Order createdOrder = new Order();
+	    Pedido createdPedido = new Pedido();
 	    
-	    createdOrder.setCustomer(user);
-	    createdOrder.setDeliveryAddress(savedAddress);
-	    createdOrder.setCreatedAt(new Date());
-	    createdOrder.setOrderStatus("PENDING");
-	    createdOrder.setRestaurant(restaurant.get());
+	    createdPedido.setCliente(user);
+	    createdPedido.setDeliveryEndereco(enderecoSalvo);
+	    createdPedido.setCriadoEm(new Date());
+	    createdPedido.setStatusPedido("PENDING");
+	    createdPedido.setRestaurant(restaurant.get());
 
-        Cart cart = cartService.findCartByUserId(user.getId());
+        Carrinho carrinho = carrinhoService.findCarrinhoByUserId(user.getId());
         
-	    List<OrderItem> orderItems = new ArrayList<>();
+	    List<PedidoItem> pedidoItems = new ArrayList<>();
 	    
-	    for (CartItem cartItem : cart.getItems()) {
-	        OrderItem orderItem = new OrderItem();
-	       orderItem.setFood(cartItem.getFood());
-	       orderItem.setIngredients(cartItem.getIngredients());
-	       orderItem.setQuantity(cartItem.getQuantity());
-	        orderItem.setTotalPrice(cartItem.getFood().getPrice()* cartItem.getQuantity());
+	    for (CarrinhoItem carrinhoItem : carrinho.getItems()) {
+	        PedidoItem pedidoItem = new PedidoItem();
+	        pedidoItem.setComida(carrinhoItem.getComida());
+	        pedidoItem.setIngredientes(carrinhoItem.getIngredients());
+	        pedidoItem.setQuantidade(carrinhoItem.getQuantidade());
+	        pedidoItem.setTotalValor(carrinhoItem.getComida().getValor()* carrinhoItem.getQuantidade());
 
-	        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-	        orderItems.add(savedOrderItem);
+	        PedidoItem savedPedidoItem = pedidoItemRepository.save(pedidoItem);
+	        pedidoItems.add(savedPedidoItem);
 	    }
    
-	     Long totalPrice = cartService.calculateCartTotals(cart);
+	     Long totalvalor = carrinhoService.calcularTotalCarrinho(carrinho);
 
-	    createdOrder.setTotalAmount(totalPrice);
-	    createdOrder.setRestaurant(restaurant.get());
+	     createdPedido.setMontanteTotal(totalvalor);
+	     createdPedido.setRestaurant(restaurant.get());
   
-	    createdOrder.setItems(orderItems);
-	    Order savedOrder = orderRepository.save(createdOrder);
+	     createdPedido.setItems(pedidoItems);
+	    Pedido savedPedido = pedidoRepository.save(createdPedido);
 
-	   restaurant.get().getOrders().add(savedOrder);
+	   restaurant.get().getOrders().add(savedPedido);
 	   
 	   restaurantRepository.save(restaurant.get());
 	   
 
 	   
-	   PaymentResponse res=paymentSerive.generatePaymentLink(savedOrder);
+	   PagamentoResponse res=pagamentoService.generatePagamentoLink(savedPedido);
 	   return res;
 
 	}
 
 	@Override
-	public void cancelOrder(Long orderId) throws OrderException {
-           Order order =findOrderById(orderId);
-           if(order==null) {
-        	   throw new OrderException("Order not found with the id "+orderId);
+	public void cancelarPedido(Long pedidoId) throws PedidoException {
+           Pedido pedido = findPedidoById(pedidoId);
+           if(pedido==null) {
+        	   throw new PedidoException("Order not found with the id "+pedidoId);
            }
 		
-		    orderRepository.deleteById(orderId);
+		    pedidoRepository.deleteById(pedidoId);
 		
 	}
 	
-	public Order findOrderById(Long orderId) throws OrderException {
-		Optional<Order> order = orderRepository.findById(orderId);
-		if(order.isPresent()) return order.get();
+	
+
+	public Pedido findPedidoById(Long pedidoId) throws PedidoException {
+		Optional<Pedido> pedido = pedidoRepository.findById(pedidoId);
+		if(pedido.isPresent()) return pedido.get();
 		
-		throw new OrderException("Order not found with the id "+orderId);
+		throw new PedidoException("Order not found with the id "+pedidoId);
 	}
 
 	@Override
-	public List<Order> getUserOrders(Long userId) throws OrderException {
-		List<Order> orders=orderRepository.findAllUserOrders(userId);
-		return orders;
+	public List<Pedido> getUserPedidos(Long userId) throws PedidoException {
+		List<Pedido> pedido=pedidoRepository.listarAllPedidosUser(userId);
+		return pedido;
 	} 
 
 	@Override
-	public List<Order> getOrdersOfRestaurant(Long restaurantId,String orderStatus) throws OrderException, RestaurantException {
+	public List<Pedido> getPedidosOfRestaurant(Long restaurantId,String pedidoStatus) throws PedidoException, RestaurantException {
 		
-			List<Order> orders = orderRepository.findOrdersByRestaurantId(restaurantId);
+			List<Pedido> pedidos = pedidoRepository.listarPedidosRestaurant(restaurantId);
 			
-			if(orderStatus!=null) {
-				orders = orders.stream()
-						.filter(order->order.getOrderStatus().equals(orderStatus))
+			if(pedidoStatus!=null) {
+				pedidos = pedidos.stream()
+						.filter(pedido->pedido.getStatusPedido().equals(pedidoStatus))
 						.collect(Collectors.toList());
 			}
 			
-			return orders;
+			return pedidos;
 	}
 //    private List<MenuItem> filterByVegetarian(List<MenuItem> menuItems, boolean isVegetarian) {
 //    return menuItems.stream()
@@ -149,18 +173,18 @@ public class PedidoServiceImpl implements PedidoService {
 	
 
 	@Override
-	public Order updateOrder(Long orderId, String orderStatus) throws OrderException {
-		Order order=findOrderById(orderId);
+	public Pedido updatePedido(Long pedidoId, String statusPedido) throws PedidoException {
+		Pedido pedido=findPedidoById(pedidoId);
 		
-		System.out.println("--------- "+orderStatus);
+		System.out.println("--------- "+statusPedido);
 		
-		if(orderStatus.equals("OUT_FOR_DELIVERY") || orderStatus.equals("DELIVERED") 
-				|| orderStatus.equals("COMPLETED") || orderStatus.equals("PENDING")) {
-			order.setOrderStatus(orderStatus);
-			Notification notification=notificationService.sendOrderStatusNotification(order);
-			return orderRepository.save(order);
+		if(statusPedido.equals("OUT_FOR_DELIVERY") || statusPedido.equals("DELIVERED") 
+				|| statusPedido.equals("COMPLETED") || statusPedido.equals("PENDING")) {
+			pedido.setStatusPedido(statusPedido);
+			Notificacao notificacao=notificacaoService.enviarPedidoStatusNotificacao(pedido);
+			return pedidoRepository.save(pedido);
 		}
-		else throw new OrderException("Please Select A Valid Order Status");
+		else throw new PedidoException("Please Select A Valid Order Status");
 		
 		
 	}

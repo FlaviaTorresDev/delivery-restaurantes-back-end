@@ -11,7 +11,7 @@ import flavia.dev.delivery_restaurantes.model.IngredientCategoria;
 
 
 
-public interface IngredientsCategoryRepository extends JpaRepository<IngredientCategoria, Long>{
+public interface IngredientsCategoriaRepository extends JpaRepository<IngredientCategoria, Long>{
 	
 	
 //	List<IngredientCategory> findByFoodId(Long menuItemId);

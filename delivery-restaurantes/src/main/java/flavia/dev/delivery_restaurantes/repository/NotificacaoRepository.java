@@ -8,7 +8,7 @@ import flavia.dev.delivery_restaurantes.model.Notificacao;
 
 
 
-public interface NotificationRepository extends JpaRepository<Notificacao, Long> {
+public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> {
 
 	public List<Notificacao> findByClienteId(Long userId);
 	public List<Notificacao> findByRestaurantId(Long restaurantId);

@@ -33,7 +33,7 @@ public class Comida {
 
     @ElementCollection
     @Column(length = 1000)
-    private List<String> imagem;
+    private List<String> imagens;
 
 //    @JsonIgnore
     @ManyToOne

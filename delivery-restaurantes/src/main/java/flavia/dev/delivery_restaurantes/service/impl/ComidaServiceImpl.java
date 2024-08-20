@@ -9,13 +9,24 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.exception.ComidaException;
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
+import flavia.dev.delivery_restaurantes.model.Categoria;
+import flavia.dev.delivery_restaurantes.model.Comida;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.repository.ComidaRepository;
+import flavia.dev.delivery_restaurantes.repository.IngredientsCategoriaRepository;
+import flavia.dev.delivery_restaurantes.request.CriarComidaRequest;
+import flavia.dev.delivery_restaurantes.service.ComidaService;
+import flavia.dev.delivery_restaurantes.service.IngredientsService;
+
 
 
 
 @Service
-public class ComidaServiceImpl implements FoodService {
+public class ComidaServiceImpl implements ComidaService {
 	@Autowired
-	private foodRepository foodRepository;
+	private ComidaRepository comidaRepository;
 	
 
 	
@@ -28,93 +39,92 @@ public class ComidaServiceImpl implements FoodService {
 	private IngredientsService ingredientService;
 	
 	@Autowired
-	private IngredientsCategoryRepository ingredientCategoryRepo;
+	private IngredientsCategoriaRepository ingredientCategoroaRepo;
 
 	@Override
-	public Food createFood(CreateFoodRequest  req,
-						   Category category,
+	public Comida criarComida(CriarComidaRequest  req,
+						   Categoria categoria,
 						   Restaurant restaurant)
-			throws FoodException,
+			throws ComidaException,
 	RestaurantException {
 
-			Food food=new Food();
-			food.setFoodCategory(category);
-			food.setCreationDate(new Date());
-			food.setDescription(req.getDescription());
-			food.setImages(req.getImages());
-			food.setName(req.getName());
-			food.setPrice((long) req.getPrice());
-			food.setSeasonal(req.isSeasonal());		
-			food.setVegetarian(req.isVegetarian());
-			food.setIngredients(req.getIngredients());
-		food.setRestaurant(restaurant);
-			food = foodRepository.save(food);
+			Comida comida=new Comida();
+			comida.setComidaCategoria(categoria);
+			comida.setCreationDate(new Date());
+			comida.setDescricao(req.getDescricao());
+			comida.setImagens(req.getImagens());
+			comida.setNome(req.getNome());
+			comida.setValor((long) req.getValor());
+			comida.setSazonal(req.isSazonal());		
+			comida.setVegetariano(req.isVegetariano());
+			comida.setIngredients(req.getIngredients());
+			comida.setRestaurant(restaurant);
+			comida = comidaRepository.save(comida);
 
-			restaurant.getFoods().add(food);
-			return food;
+			restaurant.getComidas().add(comida);
+			return comida;
 		
 	}
 
 	@Override
-	public void deleteFood(Long foodId) throws FoodException {
-		Food food=findFoodById(foodId);
-		food.setRestaurant(null);;
-//		foodRepository.save(food);
-		foodRepository.delete(food);
+	public void apagarComida(Long comidaId) throws ComidaException {
+		Comida comida=findComidaById(comidaId);
+		comida.setRestaurant(null);;
+		comidaRepository.delete(comida);
 
 	}
 
 
 	@Override
-	public List<Food> getRestaurantsFood(
+	public List<Comida> getRestaurantsComida(
 			Long restaurantId, 
-			boolean isVegetarian, 
+			boolean isVegetariano, 
 			boolean isNonveg,
-			boolean isSeasonal,
-			String foodCategory) throws FoodException {
-		List<Food> foods = foodRepository.findByRestaurantId(restaurantId);
+			boolean isSazonal,
+			String comidaCategoria) throws ComidaException {
+		List<Comida> comidas = comidaRepository.findByRestaurantId(restaurantId);
 		
 		
 		
-	    if (isVegetarian) {
-	        foods = filterByVegetarian(foods, isVegetarian);
+	    if (isVegetariano) {
+	        comidas = filterByVegetariano(comidas, isVegetariano);
 	    }
 	    if (isNonveg) {
-	        foods = filterByNonveg(foods, isNonveg);
+	        comidas = filterByNonveg(comidas, isNonveg);
 	    }
 
-	    if (isSeasonal) {
-	        foods = filterBySeasonal(foods, isSeasonal);
+	    if (isSazonal) {
+	        comidas = filterBySazonal(comidas, isSazonal);
 	    }
-	    if(foodCategory!=null && !foodCategory.equals("")) {
-	    	foods = filterByFoodCategory(foods, foodCategory);
+	    if(comidaCategoria!=null && !comidaCategoria.equals("")) {
+	    	comidas = filterByComidaCategoria(comidas, comidaCategoria);
 	    }
 		
-		return foods;
+		return comidas;
 		
 	}
 	
-	private List<Food> filterByVegetarian(List<Food> foods, boolean isVegetarian) {
-	    return foods.stream()
-	            .filter(food -> food.isVegetarian() == isVegetarian)
+	private List<Comida> filterByVegetariano(List<Comida> comidas, boolean isVegetarian) {
+	    return comidas.stream()
+	            .filter(comida -> comida.isVegetariano() == isVegetarian)
 	            .collect(Collectors.toList());
 	}
-	private List<Food> filterByNonveg(List<Food> foods, boolean isNonveg) {
-	    return foods.stream()
-	            .filter(food -> food.isVegetarian() == false)
+	private List<Comida> filterByNonveg(List<Comida> comidas, boolean isNonveg) {
+	    return comidas.stream()
+	            .filter(comida -> comida.isVegetariano() == false)
 	            .collect(Collectors.toList());
 	}
-	private List<Food> filterBySeasonal(List<Food> foods, boolean isSeasonal) {
-	    return foods.stream()
-	            .filter(food -> food.isSeasonal() == isSeasonal)
+	private List<Comida> filterBySazonal(List<Comida> comidas, boolean isSeasonal) {
+	    return comidas.stream()
+	            .filter(comida -> comida.isSazonal() == isSeasonal)
 	            .collect(Collectors.toList());
 	}
-	private List<Food> filterByFoodCategory(List<Food> foods, String foodCategory) {
+	private List<Comida> filterByComidaCategoria(List<Comida> comidas, String comidaCategoria) {
 	    
-		return foods.stream()
-			    .filter(food -> {
-			        if (food.getFoodCategory() != null) {
-			            return food.getFoodCategory().getName().equals(foodCategory);
+		return comidas.stream()
+			    .filter(comida -> {
+			        if (comida.getComidaCategoria() != null) {
+			            return comida.getComidaCategoria().getNome().equals(comidaCategoria);
 			        }
 			        return false; // Return true if food category is null
 			    })
@@ -122,33 +132,33 @@ public class ComidaServiceImpl implements FoodService {
 	}
 
 	@Override
-	public List<Food> searchFood(String keyword) {
-		List<Food> items=new ArrayList<>();
+	public List<Comida> encontrarComida(String keyword) {
+		List<Comida> items=new ArrayList<>();
 		
 		if(keyword!="") {
 			System.out.println("keyword -- "+keyword);
-			items=foodRepository.searchByNameOrCategory(keyword);
+			items=comidaRepository.pesquisarByNomeCategoria(keyword);
 		}
 		
 		return items;
 	}
 
 	@Override
-	public Food updateAvailibilityStatus(Long id) throws FoodException {
-		Food food = findFoodById(id);
+	public Comida updateAvailibilityStatus(Long id) throws ComidaException {
+		Comida comida = findComidaById(id);
 		
-		food.setAvailable(!food.isAvailable());
-		foodRepository.save(food);
-		return food;
+		comida.setAvaliacoes(!comida.isAvaliacoes());
+		comidaRepository.save(comida);
+		return comida;
 	}
 
 	@Override
-	public Food findFoodById(Long foodId) throws FoodException {
-		Optional<Food> food = foodRepository.findById(foodId);
-		if (food.isPresent()) {
-			return food.get();
+	public Comida findComidaById(Long comidaId) throws ComidaException {
+		Optional<Comida> comida = comidaRepository.findById(comidaId);
+		if (comida.isPresent()) {
+			return comida.get();
 		}
-		throw new FoodException("food with id" + foodId + "not found");
+		throw new ComidaException("food with id" + comidaId + "not found");
 	}
 
 }

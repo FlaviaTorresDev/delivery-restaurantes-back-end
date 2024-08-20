@@ -50,7 +50,7 @@ public class Pedido {
 
 //	@JsonIgnore
 	@OneToMany
-	private List<OrderItem> items;
+	private List<PedidoItem> items;
 
 	@OneToOne
 	private Pagamento pagamento;

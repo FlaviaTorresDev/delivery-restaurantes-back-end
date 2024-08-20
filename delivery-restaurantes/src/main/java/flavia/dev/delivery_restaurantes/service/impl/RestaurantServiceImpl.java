@@ -6,13 +6,25 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.dto.RestaurantDto;
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
+import flavia.dev.delivery_restaurantes.model.Endereco;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.RestaurantRepository;
+import flavia.dev.delivery_restaurantes.repository.UserRepository;
+import flavia.dev.delivery_restaurantes.repository.enderecoRepository;
+import flavia.dev.delivery_restaurantes.request.CriarRestaurantRequest;
+import flavia.dev.delivery_restaurantes.service.RestaurantService;
+import flavia.dev.delivery_restaurantes.service.UserService;
+
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
 	@Autowired
 	private RestaurantRepository restaurantRepository;
 	@Autowired
-	private AddressRepository addressRepository;
+	private enderecoRepository enderecoRepository;
 	
 	@Autowired
 	private UserService userService;
@@ -22,41 +34,41 @@ public class RestaurantServiceImpl implements RestaurantService {
 	
 
 	@Override
-	public Restaurant createRestaurant(CreateRestaurantRequest req,User user) {
-		Address address=new Address();
-		address.setCity(req.getAddress().getCity());
-		address.setCountry(req.getAddress().getCountry());
-		address.setFullName(req.getAddress().getFullName());
-		address.setPostalCode(req.getAddress().getPostalCode());
-		address.setState(req.getAddress().getState());
-		address.setStreetAddress(req.getAddress().getStreetAddress());
-		Address savedAddress = addressRepository.save(address);
+	public Restaurant createRestaurant(CriarRestaurantRequest req,User user) {
+		Endereco endereco=new Endereco();
+		endereco.setCidade(req.getEndereco().getCidade());
+		endereco.setPais(req.getEndereco().getPais());
+		endereco.setNumero(req.getEndereco().getNumero());
+		endereco.setCep(req.getEndereco().getCep());
+		endereco.setEstado(req.getEndereco().getEstado());
+		endereco.setRua(req.getEndereco().getRua());
+		Endereco enderecoSalvo = enderecoRepository.save(endereco);
 		
 		Restaurant restaurant = new Restaurant();
 		
-		restaurant.setAddress(savedAddress);
-		restaurant.setContactInformation(req.getContactInformation());
-		restaurant.setCuisineType(req.getCuisineType());
-		restaurant.setDescription(req.getDescription());
-		restaurant.setImages(req.getImages());
-		restaurant.setName(req.getName());
-		restaurant.setOpeningHours(req.getOpeningHours());
-		restaurant.setRegistrationDate(req.getRegistrationDate());
-		restaurant.setOwner(user);
+		restaurant.setEndereco(enderecoSalvo);
+		restaurant.setInformacaoContato(req.getInformacaoContato());
+		restaurant.setCozinhaTipo(req.getTipoCozinha());
+		restaurant.setDescricao(req.getDescricao());
+		restaurant.setImagens(req.getImagens());
+		restaurant.setNome(req.getNome());
+		restaurant.setHorarioAbertura(req.getHorarioAbertura());
+		restaurant.setDataRegistro(req.getDataRegistro());
+		restaurant.setProprietário(user);
 		Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
 		return savedRestaurant;
 	}
 
 	@Override
-	public Restaurant updateRestaurant(Long restaurantId, CreateRestaurantRequest updatedReq)
+	public Restaurant updateRestaurant(Long restaurantId, CriarRestaurantRequest updatedReq)
 			throws RestaurantException {
 		Restaurant restaurant = findRestaurantById(restaurantId);
-		if (restaurant.getCuisineType() != null) {
-			restaurant.setCuisineType(updatedReq.getCuisineType());
+		if (restaurant.getCozinhaTipo() != null) {
+			restaurant.setCozinhaTipo(updatedReq.getTipoCozinha());
 		}
-		if (restaurant.getDescription() != null) {
-			restaurant.setDescription(updatedReq.getDescription());
+		if (restaurant.getDescricao() != null) {
+			restaurant.setDescricao(updatedReq.getDescricao());
 		}
 		return restaurantRepository.save(restaurant);
 	}
@@ -90,7 +102,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 	@Override
 	public Restaurant getRestaurantsByUserId(Long userId) throws RestaurantException {
-		Restaurant restaurants=restaurantRepository.findByOwnerId(userId);
+		Restaurant restaurants=restaurantRepository.listarByIdProprietario(userId);
 		return restaurants;
 	}
 
@@ -98,7 +110,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 	@Override
 	public List<Restaurant> searchRestaurant(String keyword) {
-		return restaurantRepository.findBySearchQuery(keyword);
+		return restaurantRepository.listar(keyword);
 	}
 
 	@Override
@@ -106,10 +118,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 		Restaurant restaurant=findRestaurantById(restaurantId);
 		
 		RestaurantDto dto=new RestaurantDto();
-		dto.setTitle(restaurant.getName());
-		dto.setImages(restaurant.getImages());
+		dto.setTitulo(restaurant.getNome());
+		dto.setImages(restaurant.getImagens());
 		dto.setId(restaurant.getId());
-		dto.setDescription(restaurant.getDescription());
+		dto.setDescricao(restaurant.getDescricao());
 
 		boolean isFavorited = false;
 		List<RestaurantDto> favorites = user.getFavorites();
@@ -133,7 +145,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	public Restaurant updateRestaurantStatus(Long id) throws RestaurantException {
 		Restaurant restaurant=findRestaurantById(id);
-		restaurant.setOpen(!restaurant.isOpen());
+		restaurant.setAberto(!restaurant.isAberto());
 		return restaurantRepository.save(restaurant);
 	}
 

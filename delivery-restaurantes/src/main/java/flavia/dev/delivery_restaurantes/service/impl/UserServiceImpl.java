@@ -11,6 +11,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.config.JwtProvider;
+import flavia.dev.delivery_restaurantes.exception.UserException;
+import flavia.dev.delivery_restaurantes.model.PasswordResetToken;
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.PasswordResetTokenRepository;
+import flavia.dev.delivery_restaurantes.repository.UserRepository;
 import flavia.dev.delivery_restaurantes.service.UserService;
 
 
@@ -41,7 +47,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User findUserProfileByJwt(String jwt) throws UserException {
+	public User findUserPerfilByJwt(String jwt) throws UserException {
 		String email=jwtProvider.getEmailFromJwtToken(jwt);
 		
 		
@@ -63,7 +69,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> getPenddingRestaurantOwner() {
 		
-		return userRepository.getPenddingRestaurantOwners();
+		return userRepository.listarproprietáriosRestaurantesPendentes();
 	}
 	
 	@Override

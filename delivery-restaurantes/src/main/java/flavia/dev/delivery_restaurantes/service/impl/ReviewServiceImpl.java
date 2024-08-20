@@ -7,6 +7,15 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.exception.ReviewException;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.model.Review;
+import flavia.dev.delivery_restaurantes.model.User;
+import flavia.dev.delivery_restaurantes.repository.RestaurantRepository;
+import flavia.dev.delivery_restaurantes.repository.ReviewRepository;
+import flavia.dev.delivery_restaurantes.request.ReviewRequest;
+import flavia.dev.delivery_restaurantes.service.ReviewSerive;
+
 
 @Service
 public class ReviewServiceImpl implements ReviewSerive {
@@ -25,10 +34,10 @@ public class ReviewServiceImpl implements ReviewSerive {
          if(restaurant.isPresent()) {
         	 review.setRestaurant(restaurant.get());
          }
-        review.setCustomer(user);
-        review.setMessage(reviewRequest.getReviewText());
-        review.setRating(reviewRequest.getRating());
-        review.setCreatedAt(LocalDateTime.now());
+        review.setCliente(user);
+        review.setMensagem(reviewRequest.getRevisarTexto());
+        review.setAvaliacao(reviewRequest.getAvaliacao());
+        review.setCriadoEm(LocalDateTime.now());
 
         return reviewRepository.save(review);
     }
@@ -50,7 +59,7 @@ public class ReviewServiceImpl implements ReviewSerive {
     	 double totalRating = 0;
 
          for (Review review : reviews) {
-             totalRating += review.getRating();
+             totalRating += review.getAvaliacao();
          }
 
          if (reviews.size() > 0) {

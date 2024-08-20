@@ -1,60 +1,66 @@
 package flavia.dev.delivery_restaurantes.service.impl;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.events.EventException;
+
+
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
+import flavia.dev.delivery_restaurantes.model.Eventos;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.repository.EventoRepository;
+import flavia.dev.delivery_restaurantes.service.EventosService;
+import flavia.dev.delivery_restaurantes.service.RestaurantService;
 
 
 @Service
-public class EventoServiceImpl implements EventsService {
+public class EventoServiceImpl implements EventosService {
 	
 	@Autowired
-	private EventRepository eventRepository;
+	private EventoRepository eventoRepository;
 
 	@Autowired
 	private RestaurantService restaurantService;
 	
 	@Override
-	public Events createEvent(Events event,Long restaurantId) throws RestaurantException {
+	public Eventos criarEventos(Eventos evento,Long restaurantId) throws RestaurantException {
 		Restaurant restaurant=restaurantService.findRestaurantById(restaurantId);
 		
-		Events createdEvent=new Events();
-		createdEvent.setRestaurant(restaurant);
-		createdEvent.setImage(event.getImage());
-		createdEvent.setStartedAt(event.getStartedAt());
-		createdEvent.setEndsAt(event.getEndsAt());
-		createdEvent.setLocation(event.getLocation());
-		createdEvent.setName(event.getName());
+		Eventos eventoCriado=new Eventos();
+		eventoCriado.setRestaurant(restaurant);
+		eventoCriado.setImagem(evento.getImagem());
+		eventoCriado.setComecouEm(evento.getComecouEm());
+		eventoCriado.setAcabouEm(evento.getAcabouEm());
+		eventoCriado.setLocalizacao(evento.getLocalizacao());
+		eventoCriado.setNome(evento.getNome());
 		
-		return eventRepository.save(createdEvent);
+		return eventoRepository.save(eventoCriado);
 	}
 
 	@Override
-	public List<Events> findAllEvent() {
+	public List<Eventos> findAllEvento() {
+		return eventoRepository.findAll();
+	}
+
+	@Override
+	public List<Eventos> findRestaurantsEvento(Long id) {
 		// TODO Auto-generated method stub
-		return eventRepository.findAll();
+		return eventoRepository.findEventsByRestaurantId(id);
 	}
 
 	@Override
-	public List<Events> findRestaurantsEvent(Long id) {
-		// TODO Auto-generated method stub
-		return eventRepository.findEventsByRestaurantId(id);
-	}
-
-	@Override
-	public void deleteEvent(Long id) throws Exception {
-		Events event=findById(id);
-		eventRepository.delete(event);
+	public void deleteEvento(Long id) throws Exception {
+		Eventos evento=findById(id);
+		eventoRepository.delete(evento);
 		
 	}
 
 	@Override
-	public Events findById(Long id) throws Exception {
-		Optional<Events> opt=eventRepository.findById(id);
+	public Eventos findById(Long id) throws Exception {
+		Optional<Eventos> opt=eventoRepository.findById(id);
 		if(opt.isPresent()) {
 			return opt.get();
 		}

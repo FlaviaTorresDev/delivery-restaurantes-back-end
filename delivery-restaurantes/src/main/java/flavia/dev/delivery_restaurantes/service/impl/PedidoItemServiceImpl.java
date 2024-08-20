@@ -1,24 +1,26 @@
 package flavia.dev.delivery_restaurantes.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.model.PedidoItem;
+import flavia.dev.delivery_restaurantes.repository.PedidoItemRepository;
+import flavia.dev.delivery_restaurantes.service.PedidoItemService;
+
 ;
 @Service
-public class PedidoItemServiceImpl implements OrderItemService {
+public class PedidoItemServiceImpl implements PedidoItemService {
 	@Autowired
-	 private OrderItemRepository orderItemRepository;
+	 private PedidoItemRepository pedidoItemRepository;
 
 	    @Override
-	    public OrderItem createOrderIem(OrderItem orderItem) {
+	    public PedidoItem createPedidoIem(PedidoItem pedidoItem) {
 	    	
-	    	OrderItem newOrderItem=new OrderItem();
+	    	PedidoItem newPedidoItem=new PedidoItem();
 //	    	newOrderItem.setMenuItem(orderItem.getMenuItem());
 //	    	newOrderItem.setOrder(orderItem.getOrder());
-	    	newOrderItem.setQuantity(orderItem.getQuantity());
-	        return orderItemRepository.save(newOrderItem);
+	    	newPedidoItem.setQuantidade(pedidoItem.getQuantidade());
+	        return pedidoItemRepository.save(newPedidoItem);
 	    }
-	    
+}

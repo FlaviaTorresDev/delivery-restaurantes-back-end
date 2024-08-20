@@ -6,12 +6,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import flavia.dev.delivery_restaurantes.exception.RestaurantException;
+import flavia.dev.delivery_restaurantes.model.IngredientCategoria;
+import flavia.dev.delivery_restaurantes.model.IngredientsItem;
+import flavia.dev.delivery_restaurantes.model.Restaurant;
+import flavia.dev.delivery_restaurantes.repository.IngredientsCategoriaRepository;
+import flavia.dev.delivery_restaurantes.repository.IngredientsItemRepository;
+import flavia.dev.delivery_restaurantes.service.IngredientsService;
+import flavia.dev.delivery_restaurantes.service.RestaurantService;
+
 
 @Service
 public class IngredientsServiceImpl implements IngredientsService {
 
 	@Autowired
-	private IngredientsCategoryRepository ingredientsCategoryRepo;
+	private IngredientsCategoriaRepository ingredientsCategoriaRepo;
 	
 	@Autowired
 	private IngredientsItemRepository ingredientsItemRepository;
@@ -22,11 +31,11 @@ public class IngredientsServiceImpl implements IngredientsService {
 	private RestaurantService restaurantService;
 	
 	@Override
-	public IngredientCategory createIngredientsCategory(
-			String name,Long restaurantId) throws RestaurantException {
+	public IngredientCategoria criarIngredientsCategoria(
+			String nome,Long restaurantId) throws RestaurantException {
 		
-		IngredientCategory isExist=ingredientsCategoryRepo
-				.findByRestaurantIdAndNameIgnoreCase(restaurantId,name);
+		IngredientCategoria isExist=ingredientsCategoriaRepo
+				.findByRestaurantIdAndNameIgnoreCase(restaurantId,nome);
 		
 		if(isExist!=null) {
 			return isExist;
@@ -34,18 +43,18 @@ public class IngredientsServiceImpl implements IngredientsService {
 
 		Restaurant restaurant=restaurantService.findRestaurantById(restaurantId);
 		
-		IngredientCategory ingredientCategory=new IngredientCategory();
-		ingredientCategory.setRestaurant(restaurant);
-		ingredientCategory.setName(name);
+		IngredientCategoria ingredientCategoria=new IngredientCategoria();
+		ingredientCategoria.setRestaurant(restaurant);
+		ingredientCategoria.setNome(nome);
 		
-		IngredientCategory createdCategory = ingredientsCategoryRepo.save(ingredientCategory);
+		IngredientCategoria CategoriaCriada= ingredientsCategoriaRepo.save(ingredientCategoria);
 		
-		return createdCategory;
+		return CategoriaCriada;
 	}
 
 	@Override
-	public IngredientCategory findIngredientsCategoryById(Long id) throws Exception {
-		Optional<IngredientCategory> opt=ingredientsCategoryRepo.findById(id);
+	public IngredientCategoria findIngredientsCategoriaById(Long id) throws Exception {
+		Optional<IngredientCategoria> opt=ingredientsCategoriaRepo.findById(id);
 		if(opt.isEmpty()){
 			throw new Exception("ingredient category not found");
 		}
@@ -53,8 +62,8 @@ public class IngredientsServiceImpl implements IngredientsService {
 	}
 
 	@Override
-	public List<IngredientCategory> findIngredientsCategoryByRestaurantId(Long id) throws Exception {
-		return ingredientsCategoryRepo.findByRestaurantId(id);
+	public List<IngredientCategoria> findIngredientsCategoriaByRestaurantId(Long id) throws Exception {
+		return ingredientsCategoriaRepo.findByRestaurantId(id);
 	}
 
 	@Override
@@ -65,13 +74,13 @@ public class IngredientsServiceImpl implements IngredientsService {
 	
 
 	@Override
-	public IngredientsItem createIngredientsItem(Long restaurantId, 
-			String ingredientName, Long ingredientCategoryId) throws Exception {
+	public IngredientsItem criarIngredientsItem(Long restaurantId, 
+			String ingredientNome, Long ingredientCategoriaId) throws Exception {
 		
-		IngredientCategory category = findIngredientsCategoryById(ingredientCategoryId);
+		IngredientCategoria categoria = findIngredientsCategoriaById(ingredientCategoriaId);
 		
 		IngredientsItem isExist = ingredientsItemRepository.
-				findByRestaurantIdAndNameIngoreCase(restaurantId, ingredientName,category.getName());
+				findByRestaurantIdAndNameIngoreCase(restaurantId, ingredientNome,categoria.getNome());
 		if(isExist!=null) {
 			System.out.println("is exists-------- item");
 			return isExist;
@@ -80,14 +89,14 @@ public class IngredientsServiceImpl implements IngredientsService {
 		Restaurant restaurant=restaurantService.findRestaurantById(
 				restaurantId);
 		IngredientsItem item=new IngredientsItem();
-		item.setName(ingredientName);
+		item.setNome(ingredientNome);
 		item.setRestaurant(restaurant);
-		item.setCategory(category);
+		item.setCategoria(categoria);
 		
-		IngredientsItem savedIngredients = ingredientsItemRepository.save(item);
-		category.getIngredients().add(savedIngredients);
+		IngredientsItem IngredientsSalvos = ingredientsItemRepository.save(item);
+		categoria.getIngredients().add(IngredientsSalvos);
 
-		return savedIngredients;
+		return IngredientsSalvos;
 	}
 
 

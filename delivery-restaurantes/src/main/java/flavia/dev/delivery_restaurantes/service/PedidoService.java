@@ -25,7 +25,7 @@ public interface PedidoService {
 	 
 	 public List<Pedido> getUserPedidos(Long userId) throws PedidoException;
 	 
-	 public List<Pedido> getOrdersOfRestaurant(Long restaurantId,String orderStatus) throws PedidoException, RestaurantException;
+	 public List<Pedido> getPedidosOfRestaurant(Long restaurantId,String orderStatus) throws PedidoException, RestaurantException;
 	 
 
 }

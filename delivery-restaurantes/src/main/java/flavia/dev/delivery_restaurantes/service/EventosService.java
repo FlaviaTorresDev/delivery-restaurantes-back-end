@@ -9,7 +9,7 @@ import flavia.dev.delivery_restaurantes.model.Eventos;
 
 public interface EventosService {
 	
-	public Eventos createEventos(Eventos evento,Long restaurantId) throws RestaurantException;
+	public Eventos criarEventos(Eventos evento,Long restaurantId) throws RestaurantException;
 	
 	public List<Eventos> findAllEvento();
 	

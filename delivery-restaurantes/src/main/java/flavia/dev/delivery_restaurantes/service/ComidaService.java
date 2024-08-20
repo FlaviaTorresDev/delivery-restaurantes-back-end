@@ -14,10 +14,10 @@ import flavia.dev.delivery_restaurantes.request.CriarComidaRequest;
 
 public interface ComidaService {
 
-	public Comida createFood(CriarComidaRequest req,Categoria categoria,
+	public Comida criarComida(CriarComidaRequest req,Categoria categoria,
 						   Restaurant restaurant) throws ComidaException, RestaurantException;
 
-	void deleteComida(Long ComidaId) throws ComidaException;
+	void apagarComida(Long ComidaId) throws ComidaException;
 	
 	public List<Comida> getRestaurantsComida(Long restaurantId,
 			boolean isVegetarian, boolean isNonveg, boolean isSeasonal,String ComidaCategory) throws ComidaException;

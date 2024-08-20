@@ -11,18 +11,18 @@ import flavia.dev.delivery_restaurantes.model.IngredientsItem;
 
 public interface IngredientsService {
 	
-	public IngredientCategoria createIngredientsCategoria(
+	public IngredientCategoria criarIngredientsCategoria(
 			String nome,Long restaurantId) throws RestaurantException;
 
-	public IngredientCategoria findIngredientsCategoryById(Long id) throws Exception;
+	public IngredientCategoria findIngredientsCategoriaById(Long id) throws Exception;
 
-	public List<IngredientCategoria> findIngredientsCategoryByRestaurantId(Long id) throws Exception;
+	public List<IngredientCategoria> findIngredientsCategoriaByRestaurantId(Long id) throws Exception;
 	
 	public List<IngredientsItem> findRestaurantsIngredients(
 			Long restaurantId);
 
 	
-	public IngredientsItem createIngredientsItem(Long restaurantId, 
+	public IngredientsItem criarIngredientsItem(Long restaurantId, 
 			String ingredientName,Long ingredientCategoryId) throws Exception;
 
 	public IngredientsItem updateStoke(Long id) throws Exception;
