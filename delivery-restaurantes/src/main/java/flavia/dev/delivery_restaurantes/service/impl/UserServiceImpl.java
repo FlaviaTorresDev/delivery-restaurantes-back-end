@@ -3,7 +3,6 @@ package flavia.dev.delivery_restaurantes.service.impl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.mail.SimpleMailMessage;
@@ -31,7 +30,7 @@ public class UserServiceImpl implements UserService {
 	private PasswordResetTokenRepository passwordResetTokenRepository;
 	private JavaMailSender javaMailSender;
 	
-	public UserServiceImplementation(
+	public void UserServiceImplementation(
 			UserRepository userRepository,
 			JwtProvider jwtProvider,
 			PasswordEncoder passwordEncoder,
