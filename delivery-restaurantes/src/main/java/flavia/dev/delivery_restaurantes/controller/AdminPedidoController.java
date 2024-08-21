@@ -21,7 +21,7 @@ import flavia.dev.delivery_restaurantes.service.UserService;
 
 @RestController
 @RequestMapping("/api/admin")
-public class AdminOrderController {
+public class AdminPedidoController {
 	
 	@Autowired
 	private PedidoService pedidoService;
